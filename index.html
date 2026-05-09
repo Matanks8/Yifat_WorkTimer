@@ -1,56 +1,57 @@
+<!-- כל ה-CSS וה-HTML נשאר זהה ל-2.5.1, השינויים בוצעו בלוגיקה של ה-JS -->
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>קודי עבור יפעת - ניהול זמן</title>
+    <title> אמא - ספירת שעות v2.5.1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --primary: #db2777; --success: #059669; --warning: #f59e0b; }
-        .progress-pipe { height: 32px; border-radius: 16px; background: #f3f4f6; position: relative; overflow: hidden; }
+        :root { --primary: #db2777; --success: #059669; } /* שינוי קל לורוד בשביל ההפרדה */
+        .progress-pipe { height: 32px; border-radius: 16px; background: #e2e8f0; position: relative; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, #ec4899, #db2777); transition: width 0.5s ease; position: absolute; z-index: 5; }
-        .progress-planned { height: 100%; background: #fde68a; transition: width 0.5s ease; position: absolute; z-index: 4; opacity: 0.7; }
+        .progress-planned { height: 100%; background: #fde047; transition: width 0.5s ease; position: absolute; z-index: 4; opacity: 0.6; }
         .tab-active { background: white !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1); color: #db2777 !important; }
-        input[type="number"] { -moz-appearance: textfield; }
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .modal-up { animation: slideUp 0.3s ease-out; }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-pink-50 font-sans min-h-screen pb-32 text-slate-900 leading-tight">
+<body class="bg-slate-50 font-sans min-h-screen pb-32 text-slate-900">
 
-    <header class="bg-pink-600 text-white p-6 shadow-2xl rounded-b-[3rem] sticky top-0 z-40">
+    <header class="bg-pink-700 text-white p-6 shadow-2xl rounded-b-[3rem] sticky top-0 z-40">
         <div class="flex justify-between items-center max-w-md mx-auto">
             <div>
                 <h1 class="text-xl font-bold tracking-tight text-pink-50">שלום, יפעת ❤️</h1>
-                <p class="text-[10px] opacity-70 font-mono">IFAT EDITION v1.0</p>
+                <p class="text-[10px] opacity-60 font-mono">IFAT VERSION: 2.5.1</p>
             </div>
-            <div class="flex items-center gap-2 bg-pink-700/50 p-1 rounded-full border border-white/20 text-xs">
+            <div class="flex items-center gap-2 bg-pink-600/50 p-1 rounded-full border border-white/20">
                 <button onclick="changeMonth(-1)" class="w-8 h-8 flex items-center justify-center">◀</button>
-                <span id="monthDisplay" class="font-bold w-24 text-center"></span>
+                <span id="monthDisplay" class="text-xs font-bold w-24 text-center"></span>
                 <button onclick="changeMonth(1)" class="w-8 h-8 flex items-center justify-center">▶</button>
             </div>
         </div>
     </header>
 
-    <nav class="flex p-1.5 bg-pink-100/60 backdrop-blur-md mx-6 -mt-4 rounded-2xl gap-1 shadow-sm relative z-50 max-w-md mx-auto text-sm">
-        <button onclick="switchTab('dash')" id="tabDash" class="flex-1 py-2 font-bold rounded-xl text-pink-400 tab-active">מצב נוכחי</button>
-        <button onclick="switchTab('cal')" id="tabCal" class="flex-1 py-2 font-bold rounded-xl text-pink-400">לוח שנה</button>
+    <nav class="flex p-1.5 bg-slate-200/60 backdrop-blur-md mx-6 -mt-4 rounded-2xl gap-1 shadow-sm relative z-50 max-w-md mx-auto text-sm">
+        <button onclick="switchTab('dash')" id="tabDash" class="flex-1 py-2 font-bold rounded-xl text-slate-500 tab-active transition-all">מצב נוכחי</button>
+        <button onclick="switchTab('cal')" id="tabCal" class="flex-1 py-2 font-bold rounded-xl text-slate-500 transition-all">לוח שנה</button>
     </nav>
 
     <main id="viewDash" class="p-6 space-y-6 max-w-md mx-auto">
-        <!-- Dashboard -->
-        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-pink-50">
+        <!-- Dashboard Card -->
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-indigo-50">
             <div class="flex justify-between items-start mb-6">
                 <div>
                     <span class="text-[11px] text-slate-400 font-bold uppercase">יתרה לסיום</span>
-                    <div class="text-5xl font-black text-pink-600 tracking-tight" id="hoursRemaining">00:00</div>
+                    <div class="text-5xl font-black text-indigo-600 tracking-tight" id="hoursRemaining">00:00</div>
                 </div>
-                <div class="bg-pink-50 p-3 rounded-2xl border border-pink-100 flex flex-col items-end">
-                    <span class="text-[9px] text-pink-600 font-bold">יעד שעות</span>
-                    <div class="flex items-center gap-1 text-lg font-black dir-ltr">
-                        <input type="number" id="targetH" onchange="saveSettings()" class="w-10 bg-transparent text-center outline-none">
+                <div class="text-left space-y-2">
+                    <div class="bg-slate-50 p-2 rounded-2xl border border-slate-100 flex flex-col items-end">
+                        <span class="text-[9px] text-slate-400 font-bold">יעד בסיס</span>
+                        <div class="flex items-center gap-1 text-sm font-black dir-ltr">
+                            <input type="number" id="targetM" onchange="saveSettings()" class="w-6 bg-transparent text-left outline-none">:
+                            <input type="number" id="targetH" onchange="saveSettings()" class="w-8 bg-transparent text-right outline-none">
+                        </div>
                     </div>
+               
                 </div>
             </div>
 
@@ -59,25 +60,27 @@
                 <div id="plannedFill" class="progress-planned"></div>
             </div>
             <div class="flex justify-between mt-2 text-[10px] font-bold">
-                <span id="doneLabel" class="text-emerald-600 font-black"></span>
-                <span id="targetLabel" class="text-pink-400"></span>
+                <span id="doneLabel" class="text-emerald-500 font-black"></span>
+                <span id="targetLabel" class="text-indigo-400"></span>
             </div>
         </div>
 
-        <!-- Controls -->
+        <!-- Timer & Controls -->
         <div class="grid grid-cols-2 gap-4">
-            <div class="bg-white p-4 rounded-[2rem] shadow-md border border-pink-100 flex flex-col items-center justify-center relative">
+            <div class="bg-white p-4 rounded-[2rem] shadow-md border border-indigo-100 flex flex-col items-center justify-center relative">
                 <button onclick="toggleCheckIn()" id="checkBtn" class="z-10 flex flex-col items-center">
                     <span id="checkIcon" class="text-3xl mb-1">📍</span>
                     <span id="checkText" class="font-bold text-sm">כניסה</span>
                 </button>
                 <div id="liveTimer" class="hidden text-[10px] font-mono font-bold text-red-500 mt-1 animate-pulse">00:00:00</div>
-                <button onclick="toggleOffset()" class="absolute top-3 left-3 text-slate-300">⚙️</button>
-                <div id="offsetTool" class="hidden absolute inset-0 bg-white/95 rounded-[2rem] flex flex-col items-center justify-center z-20">
-                    <input type="number" id="offsetMins" placeholder="דקות תיקון" class="w-20 bg-slate-100 rounded-lg text-center font-bold mb-2 p-1">
+                <!-- Offset Tool -->
+                <button onclick="toggleOffset()" class="absolute top-3 left-3 text-slate-300 hover:text-indigo-500">⚙️</button>
+                <div id="offsetTool" class="hidden absolute inset-0 bg-white/95 rounded-[2rem] flex flex-col items-center justify-center p-2 z-20">
+                    <span class="text-[9px] font-bold mb-1 italic">תיקון זמן (דקות)</span>
+                    <input type="number" id="offsetMins" placeholder="דקות" class="w-16 bg-slate-100 rounded-lg text-center font-bold mb-2">
                     <div class="flex gap-2">
-                        <button onclick="toggleOffset()" class="text-[9px] font-bold text-slate-400">ביטול</button>
-                        <button onclick="applyOffset()" class="text-[9px] font-bold text-pink-600">החל</button>
+                        <button onclick="toggleOffset()" class="text-[9px] font-bold text-slate-400 uppercase">ביטול</button>
+                        <button onclick="applyOffset()" class="text-[9px] font-bold text-indigo-600 uppercase">החל</button>
                     </div>
                 </div>
             </div>
@@ -87,38 +90,105 @@
             </button>
         </div>
 
-        <!-- Prediction -->
-        <div id="predictionBox" class="bg-pink-50 p-4 rounded-3xl border-r-4 border-r-pink-500 text-xs italic text-pink-900 shadow-sm leading-relaxed"></div>
+        <div id="predictionBox" class="bg-indigo-50 p-4 rounded-3xl border-r-4 border-r-indigo-500 text-xs italic text-indigo-900 shadow-sm leading-relaxed"></div>
 
-        <!-- Log -->
         <div class="space-y-3 pb-10">
             <h3 class="font-black text-slate-400 text-[10px] uppercase tracking-widest px-2">יומן פעילות</h3>
             <div id="logList" class="space-y-2"></div>
         </div>
     </main>
 
+    <!-- Calendar View -->
     <main id="viewCal" class="hidden p-6 max-w-md mx-auto">
-        <div id="calendarGrid" class="grid grid-cols-7 gap-2 bg-white p-4 rounded-3xl shadow-xl"></div>
+        <div class="bg-white p-6 rounded-[2.5rem] shadow-xl border border-indigo-50">
+            <div class="grid grid-cols-7 mb-4 text-center text-[10px] font-black text-slate-300">
+                <div>א</div><div>ב</div><div>ג</div><div>ד</div><div>ה</div><div>ו</div><div>ש</div>
+            </div>
+            <div id="calendarGrid" class="grid grid-cols-7 gap-2"></div>
+        </div>
     </main>
 
-    <!-- Manual Entry Modal -->
+    <!-- Footer with Changelog -->
+    <footer class="fixed bottom-0 left-0 right-0 bg-slate-100/80 backdrop-blur-md p-4 flex justify-center z-50">
+        <button onclick="toggleChangelog()" class="text-[10px] font-bold text-indigo-400 hover:text-indigo-600 uppercase tracking-widest border-b border-indigo-200 pb-0.5">
+            📋 מה חדש בגרסה 2.5.1?
+        </button>
+    </footer>
+
+    <!-- Changelog Modal -->
+    <div id="changelogModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[200] p-6 overflow-y-auto">
+        <div class="bg-white rounded-[2.5rem] max-w-md mx-auto p-8 modal-up">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black text-indigo-700 italic">יומן עדכונים</h2>
+                <button onclick="toggleChangelog()" class="text-slate-300 text-2xl">✕</button>
+            </div>
+            <div class="space-y-8 text-sm" id="changelogContent">
+                <!-- הגרסה החדשה ביותר -->
+                <section>
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-indigo-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold tracking-widest">2.5.1</span>
+                        <span class="text-slate-400 text-[10px]">היום</span>
+                    </div>
+                    <ul class="space-y-2 text-slate-600">
+                        <li>🚀 <b>חדש:</b> מנגנון סטייה (Offset) - הוספה/הפחתה של דקות בדיווח בזמן אמת.</li>
+                        <li>📋 <b>חדש:</b> ארכיון עדכונים מפורט (זה שאתה קורא עכשיו).</li>
+                        <li>🛠️ <b>שינוי:</b> שיפור נראות היעד והבונוס.</li>
+                    </ul>
+                </section>
+                <section class="opacity-60">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-slate-400 text-white text-[10px] px-2 py-0.5 rounded-full font-bold tracking-widest">2.5.0</span>
+                    </div>
+                    <ul class="space-y-2 text-slate-600">
+                        <li>🚀 <b>חדש:</b> טיימר פעיל בזמן אמת מתחת לכפתור הכניסה.</li>
+                        <li>🚀 <b>חדש:</b> אישור אירועים עתידיים והפיכתם לדיווחים בפועל.</li>
+                        <li>🛠️ <b>תיקון:</b> מודל חיזוי שעות חכם שמתחשב ביום הנוכחי.</li>
+                        <li>🛠️ <b>שינוי:</b> היפוך שדות שעות/דקות לקריאה אינטואיטיבית.</li>
+                    </ul>
+                </section>
+                <section class="opacity-40">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="bg-slate-400 text-white text-[10px] px-2 py-0.5 rounded-full font-bold tracking-widest">2.4.0</span>
+                    </div>
+                    <ul class="space-y-2 text-slate-600">
+                        <li>🚀 <b>חדש:</b> תוספת שדה "בונוס מנהלת" המשפיע על היעד והמד.</li>
+                        <li>🛠️ <b>שינוי:</b> שדרוג ויזואלי לכל הממשק (פינות עגולות וצללים).</li>
+                    </ul>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entry Modal (Manual) -->
     <div id="entryModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-end justify-center">
-        <div class="bg-white w-full max-w-md rounded-t-[3rem] p-8 modal-up">
+        <div class="bg-white w-full max-w-md rounded-t-[3rem] p-8 shadow-2xl modal-up">
             <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6"></div>
+            <h2 id="modalTitle" class="text-xl font-bold mb-6 text-center italic">דיווח עבודה</h2>
             <div class="space-y-4">
-                <input type="date" id="entryDate" class="w-full bg-slate-100 rounded-2xl p-4 font-bold text-center">
+                <input type="date" id="entryDate" class="w-full bg-slate-100 rounded-2xl p-4 font-bold text-center border-none">
+                <select id="entryType" class="w-full bg-slate-100 rounded-2xl p-4 font-bold text-center appearance-none border-none">
+                    <option value="עבודה">🏢 עבודה במחלקה</option>
+                    <option value="הדרכה">📚 הדרכה / ישיבה</option>
+                    <option value="חופשה/חג">🏖️ חופשה / מחלה</option>
+                </select>
                 <div class="flex items-center gap-3 justify-center">
-                    <input type="number" id="entryM" placeholder="דקות" class="bg-slate-100 rounded-2xl p-4 w-24 text-center outline-none font-bold">
+                    <div class="bg-slate-100 rounded-2xl p-4 flex-1 text-center">
+                        <span class="text-[9px] block text-slate-400 font-bold uppercase">דקות</span>
+                        <input type="number" id="entryM" placeholder="00" class="bg-transparent text-xl font-black w-full text-center outline-none">
+                    </div>
                     <span class="text-2xl font-black">:</span>
-                    <input type="number" id="entryH" placeholder="שעות" class="bg-slate-100 rounded-2xl p-4 w-24 text-center outline-none font-bold">
+                    <div class="bg-slate-100 rounded-2xl p-4 flex-1 text-center">
+                        <span class="text-[9px] block text-slate-400 font-bold uppercase">שעות</span>
+                        <input type="number" id="entryH" placeholder="0" class="bg-transparent text-xl font-black w-full text-center outline-none">
+                    </div>
                 </div>
-                <div class="flex items-center justify-center gap-3 p-4 bg-yellow-50 rounded-2xl border border-yellow-100">
-                    <input type="checkbox" id="isPlanned" class="w-5 h-5">
-                    <span class="text-sm font-bold text-yellow-800">אירוע עתידי / תכנון</span>
+                <div id="plannedToggle" class="flex items-center justify-center gap-3 p-4 bg-yellow-50 rounded-2xl border border-yellow-100">
+                    <input type="checkbox" id="isPlanned" class="w-5 h-5 rounded-lg">
+                    <span class="text-sm font-bold text-yellow-800 tracking-tight">זהו אירוע עתידי (תכנון)</span>
                 </div>
                 <div class="flex gap-3 pt-4">
                     <button onclick="closeModal()" class="flex-1 py-4 font-bold text-slate-400">ביטול</button>
-                    <button onclick="saveEntry()" class="flex-1 py-4 bg-pink-600 text-white font-black rounded-2xl">שמור</button>
+                    <button onclick="saveEntry()" class="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg">שמור</button>
                 </div>
             </div>
         </div>
@@ -126,32 +196,54 @@
 
     <script>
         const monthNames = ["ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
-        let db = JSON.parse(localStorage.getItem('ifat_hours_db')) || { months: {}, checkIn: null, settings: { targetH: 120 } };
-        let currentViewDate = new Date();
+		let db = JSON.parse(localStorage.getItem('ifat_hours_db')) || { months: {}, checkIn: null, settings: { targetH: 120, targetM: 0, bonusH: 0 } };        let currentViewDate = new Date();
+        let editIdx = null;
         let timerInterval;
+
+        function exportSummary() {
+            const data = getCurrentMonthData();
+            let text = `דוח שעות - ${monthNames[currentViewDate.getMonth()]} ${currentViewDate.getFullYear()}\n`;
+            text += `---------------------------\n`;
+            data.logs.forEach(l => {
+                text += `${l.date.split('-').reverse().join('/')} | ${l.type} | ${toHHMM(l.mins)} ש'\n`;
+            });
+            const done = data.logs.filter(l => l.type !== 'חופשה/חג' && !l.planned).reduce((s, l) => s + l.mins, 0);
+            text += `---------------------------\n`;
+            text += `סה"כ שעות עבודה: ${toHHMM(done)}`;
+            
+            navigator.clipboard.writeText(text);
+            alert("הדוח הועתק ללוח! ניתן להדביק אותו בוואטסאפ.");
+        }
+
 
         function getMonthKey(date) { return `${date.getFullYear()}-${date.getMonth() + 1}`; }
 
         function renderAll() {
             const data = getCurrentMonthData();
+            const now = new Date();
+            
             document.getElementById('monthDisplay').innerText = `${monthNames[currentViewDate.getMonth()]} ${currentViewDate.getFullYear()}`;
             document.getElementById('targetH').value = db.settings.targetH;
+            document.getElementById('targetM').value = db.settings.targetM;
+            document.getElementById('bonusH').value = db.settings.bonusH;
 
-            const done = data.logs.filter(l => !l.planned).reduce((s, l) => s + l.mins, 0);
-            const planned = data.logs.filter(l => l.planned).reduce((s, l) => s + l.mins, 0);
-            const totalTargetMins = db.settings.targetH * 60;
+            const done = data.logs.filter(l => l.type !== 'חופשה/חג' && !l.planned).reduce((s, l) => s + l.mins, 0);
+            const planned = data.logs.filter(l => l.type !== 'חופשה/חג' && l.planned).reduce((s, l) => s + l.mins, 0);
+            const holidayMins = data.logs.filter(l => l.type === 'חופשה/חג').reduce((s, l) => s + l.mins, 0);
+            
+            const totalTargetMins = (db.settings.targetH * 60 + db.settings.targetM) + (db.settings.bonusH * 60) - holidayMins;
             const remaining = totalTargetMins - done;
 
             document.getElementById('hoursRemaining').innerText = toHHMM(remaining);
             document.getElementById('doneLabel').innerText = `בוצע: ${toHHMM(done)}`;
-            document.getElementById('targetLabel').innerText = `יעד: ${toHHMM(totalTargetMins)}`;
+            document.getElementById('targetLabel').innerText = `יעד סופי: ${toHHMM(totalTargetMins)}`;
             
             document.getElementById('progressFill').style.width = `${Math.min((done/totalTargetMins)*100, 100)}%`;
             document.getElementById('plannedFill').style.width = `${Math.min(((done+planned)/totalTargetMins)*100, 100)}%`;
 
             renderLogList(data.logs);
             calculatePrediction(remaining, planned);
-            localStorage.setItem('ifat_hours_db', JSON.stringify(db));
+            localStorage.setItem('matan_hours_db', JSON.stringify(db));
         }
 
         function calculatePrediction(rem, plan) {
@@ -162,15 +254,35 @@
             }
             const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
             let workDaysLeft = 0;
-            for (let d = now.getDate(); d <= lastDay; d++) {
+            const monthLogs = getCurrentMonthData().logs;
+           for (let d = now.getDate(); d <= lastDay; d++) {
                 const dateObj = new Date(now.getFullYear(), now.getMonth(), d);
                 const day = dateObj.getDay();
-                if (day >= 0 && day <= 4) { // Sunday to Thursday
-                    workDaysLeft++;
+                // שינוי: ימים א' עד ה'
+                if (day >= 0 && day <= 4) { 
+                    const dateStr = dateObj.toISOString().split('T')[0];
+                    if (d > now.getDate() || (!monthLogs.some(l => l.date === dateStr && !l.planned) && !db.checkIn) || db.checkIn) {
+                        workDaysLeft++;
                 }
             }
             const needed = workDaysLeft > 0 ? (rem - plan) / workDaysLeft : 0;
-            document.getElementById('predictionBox').innerHTML = `נשארו <b>${workDaysLeft}</b> ימי עבודה (א'-ה'). ממוצע נדרש: <b>${toHHMM(needed)}</b> ליום.`;
+            document.getElementById('predictionBox').innerHTML = `נשארו <b>${workDaysLeft}</b> ימי עבודה (א'-ה'). נדרש ממוצע של <b>${toHHMM(needed)}</b> ליום.`;
+        }
+
+        function toggleOffset() { document.getElementById('offsetTool').classList.toggle('hidden'); }
+        
+        function applyOffset() {
+            const off = parseInt(document.getElementById('offsetMins').value) || 0;
+            if (db.checkIn) {
+                // הזזת זמן הכניסה אחורה (כדי להוסיף זמן) או קדימה (כדי להפחית)
+                db.checkIn = db.checkIn - (off * 60000);
+                alert(`בוצע תיקון של ${off} דקות לזמן הנוכחי.`);
+                toggleOffset();
+                document.getElementById('offsetMins').value = '';
+                renderAll();
+            } else {
+                alert("ניתן לתקן סטייה רק בזמן שהטיימר פעיל (אחרי כניסה).");
+            }
         }
 
         function toggleCheckIn() {
@@ -178,7 +290,7 @@
             if (!db.checkIn) { db.checkIn = now; startTimer(); } 
             else {
                 const mins = Math.round((now - db.checkIn) / 60000);
-                if (mins > 0) getCurrentMonthData().logs.push({ date: new Date().toISOString().split('T')[0], mins, planned: false, type: 'עבודה' });
+                if (mins > 0) getCurrentMonthData().logs.push({ date: new Date().toISOString().split('T')[0], type: 'עבודה', mins, planned: false });
                 db.checkIn = null; stopTimer();
             }
             renderAll(); updateCheckInUI();
@@ -201,33 +313,75 @@
             const btn = document.getElementById('checkBtn');
             if (db.checkIn) {
                 document.getElementById('checkIcon').innerText = "⏹️";
-                document.getElementById('checkText').innerText = "סיום";
-                btn.parentElement.classList.add('bg-red-50');
+                document.getElementById('checkText').innerText = "סיום עבודה";
+                btn.parentElement.classList.add('bg-red-50', 'border-red-200');
                 if(!timerInterval) startTimer();
             } else {
                 document.getElementById('checkIcon').innerText = "📍";
                 document.getElementById('checkText').innerText = "כניסה";
-                btn.parentElement.classList.remove('bg-red-50');
+                btn.parentElement.classList.remove('bg-red-50', 'border-red-200');
             }
         }
 
         function renderLogList(logs) {
             const list = document.getElementById('logList');
-            list.innerHTML = '';
+            list.innerHTML = logs.length === 0 ? '<p class="text-center opacity-20 text-xs py-5">אין נתונים</p>' : '';
             [...logs].reverse().forEach((log, i) => {
                 const realIdx = logs.length - 1 - i;
                 const div = document.createElement('div');
-                div.className = `flex justify-between items-center p-4 bg-white rounded-2xl shadow-sm border border-pink-50 ${log.planned ? 'bg-yellow-50' : ''}`;
-                div.innerHTML = `<div><div class="font-bold text-pink-700">${log.date.split('-').reverse().join('/')}</div><div class="text-[10px] text-slate-400 font-bold">${toHHMM(log.mins)}</div></div>
-                    <button onclick="deleteLog(${realIdx})" class="text-slate-300">✕</button>`;
+                div.className = `flex justify-between items-center p-4 bg-white rounded-2xl shadow-sm border border-slate-50 ${log.planned ? 'bg-yellow-50/50 border-yellow-100' : ''}`;
+                div.innerHTML = `<div onclick="editLog(${realIdx})" class="flex-1">
+                        <div class="font-bold text-sm text-slate-700">${log.type} ${log.planned ? '⏳' : '✅'}</div>
+                        <div class="text-[10px] text-slate-400 font-bold">${log.date.split('-').reverse().join('/')} • ${toHHMM(log.mins)}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        ${log.planned ? `<button onclick="approvePlanned(${realIdx})" class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600">✓</button>` : ''}
+                        <button onclick="deleteLog(${realIdx})" class="w-8 h-8 text-slate-300">✕</button>
+                    </div>`;
                 list.appendChild(div);
             });
         }
 
+        function approvePlanned(i) {
+            const log = getCurrentMonthData().logs[i];
+            log.planned = false; renderAll(); editLog(i);
+        }
+
         function saveEntry() {
             const mins = (parseInt(document.getElementById('entryH').value)||0)*60 + (parseInt(document.getElementById('entryM').value)||0);
-            getCurrentMonthData().logs.push({ date: document.getElementById('entryDate').value, mins, planned: document.getElementById('isPlanned').checked });
+            const entry = { date: document.getElementById('entryDate').value, type: document.getElementById('entryType').value, mins: mins, planned: document.getElementById('isPlanned').checked };
+            if (editIdx !== null) getCurrentMonthData().logs[editIdx] = entry;
+            else getCurrentMonthData().logs.push(entry);
             closeModal(); renderAll();
+        }
+
+        function editLog(i) {
+            const log = getCurrentMonthData().logs[i]; editIdx = i;
+            document.getElementById('modalTitle').innerText = "עריכת דיווח";
+            document.getElementById('entryDate').value = log.date;
+            document.getElementById('entryType').value = log.type;
+            document.getElementById('entryH').value = Math.floor(log.mins/60);
+            document.getElementById('entryM').value = log.mins%60;
+            document.getElementById('isPlanned').checked = log.planned;
+            document.getElementById('entryModal').classList.remove('hidden');
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            grid.innerHTML = '';
+            const firstDay = new Date(currentViewDate.getFullYear(), currentViewDate.getMonth(), 1).getDay();
+            const daysInMonth = new Date(currentViewDate.getFullYear(), currentViewDate.getMonth()+1, 0).getDate();
+            const logs = getCurrentMonthData().logs;
+            for(let i=0; i<firstDay; i++) grid.innerHTML += '<div></div>';
+            for(let d=1; d<=daysInMonth; d++) {
+                const dStr = `${currentViewDate.getFullYear()}-${String(currentViewDate.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                const dayLogs = logs.filter(l => l.date === dStr);
+                let bg = 'bg-slate-50 text-slate-300';
+                if(dayLogs.some(l=>!l.planned && l.type!=='חופשה/חג')) bg='bg-emerald-100 text-emerald-700 font-bold';
+                else if(dayLogs.some(l=>l.planned)) bg='bg-yellow-100 text-yellow-700';
+                else if(dayLogs.some(l=>l.type==='חופשה/חג')) bg='bg-orange-100 text-orange-600';
+                grid.innerHTML += `<div class="calendar-day ${bg}">${d}</div>`;
+            }
         }
 
         function getCurrentMonthData() {
@@ -241,19 +395,26 @@
             return `${mins < 0 ? '-' : ''}${Math.floor(abs/60)}:${String(Math.round(abs%60)).padStart(2,'0')}`;
         }
 
-        function saveSettings() { db.settings.targetH = parseInt(document.getElementById('targetH').value) || 0; renderAll(); }
+        function saveSettings() {
+            db.settings.targetH = parseInt(document.getElementById('targetH').value) || 0;
+            db.settings.targetM = parseInt(document.getElementById('targetM').value) || 0;
+            db.settings.bonusH = parseInt(document.getElementById('bonusH').value) || 0;
+            renderAll();
+        }
+
         function switchTab(t) {
             document.getElementById('viewDash').classList.toggle('hidden', t!=='dash');
             document.getElementById('viewCal').classList.toggle('hidden', t!=='cal');
             document.getElementById('tabDash').classList.toggle('tab-active', t==='dash');
             document.getElementById('tabCal').classList.toggle('tab-active', t==='cal');
+            if(t==='cal') renderCalendar();
         }
-        function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth()+dir); renderAll(); }
-        function openModal() { document.getElementById('entryModal').classList.remove('hidden'); document.getElementById('entryDate').valueAsDate = new Date(); }
+
+        function changeMonth(dir) { currentViewDate.setMonth(currentViewDate.getMonth()+dir); renderAll(); if(!document.getElementById('viewCal').classList.contains('hidden')) renderCalendar(); }
+        function openModal() { editIdx = null; document.getElementById('modalTitle').innerText = "דיווח עבודה"; document.getElementById('entryModal').classList.remove('hidden'); document.getElementById('entryDate').valueAsDate = new Date(); }
         function closeModal() { document.getElementById('entryModal').classList.add('hidden'); }
         function deleteLog(i) { if(confirm("למחוק?")) { getCurrentMonthData().logs.splice(i, 1); renderAll(); } }
-        function toggleOffset() { document.getElementById('offsetTool').classList.toggle('hidden'); }
-        function applyOffset() { if(db.checkIn) { db.checkIn -= (document.getElementById('offsetMins').value * 60000); toggleOffset(); renderAll(); } }
+        function toggleChangelog() { document.getElementById('changelogModal').classList.toggle('hidden'); }
 
         window.onload = () => { updateCheckInUI(); renderAll(); };
     </script>
