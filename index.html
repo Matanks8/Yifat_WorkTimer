@@ -166,7 +166,7 @@
             localStorage.setItem('ifat_hours_db', JSON.stringify(db));
         }
 
-        function calculatePrediction(rem, plan) {
+function calculatePrediction(rem, plan) {
             const now = new Date();
             if (getMonthKey(now) !== getMonthKey(currentViewDate)) {
                 document.getElementById('predictionBox').innerText = "צפייה בחודש לא פעיל.";
@@ -178,36 +178,34 @@
 
             for (let d = now.getDate(); d <= lastDay; d++) {
                 const dateObj = new Date(now.getFullYear(), now.getMonth(), d);
-                const day = dateObj.getDay(); // 0=Sun, 4=Thu
+                const day = dateObj.getDay();
                 const dateStr = dateObj.toISOString().split('T')[0];
 
+                // בדיקה אם היום הוא יום עבודה פוטנציאלי (א-ה)
                 if (day >= 0 && day <= 4) {
-                    // לוגיקה קריטית: האם יש דיווח "חופשה" ליום הזה?
-                    const isVacationDay = data.logs.some(l => l.date === dateStr && l.type === 'חופשה');
+                    // בדיקה אם יפעת כבר הזינה שהיום הזה הוא חופשה
+                    const isVacation = data.logs.some(l => l.date === dateStr && l.type === 'חופשה');
                     
-                    // האם היא כבר עבדה היום (רישום עבודה רגיל ולא מתוכנן)?
-                    const workedToday = (d === now.getDate() && data.logs.some(l => l.date === dateStr && !l.planned && l.type === 'עבודה'));
+                    // אם יפעת כבר עבדה היום (יש רישום עבודה שאינו מתוכנן) - לא נספור את היום כיום שנותר
+                    const alreadyWorkedToday = (d === now.getDate() && data.logs.some(l => l.date === dateStr && !l.planned && l.type === 'עבודה'));
 
-                    if (!isVacationDay && !workedToday) {
+                    if (!isVacation && !alreadyWorkedToday) {
                         workDaysLeft++;
                     }
                 }
             }
             
+            // חישוב הממוצע: כמה שעות נשארו חלקי ימי העבודה שבאמת נשארו
             const netRemaining = rem - plan;
             const needed = workDaysLeft > 0 ? netRemaining / workDaysLeft : 0;
             
             document.getElementById('predictionBox').innerHTML = `
-                <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-slate-500">ימי עבודה שנותרו:</span>
-                    <span class="font-black text-slate-800">${workDaysLeft} ימים</span>
+                <div class="flex justify-between items-center font-bold">
+                    <span>נותרו <b>${workDaysLeft}</b> ימי עבודה</span>
+                    <span>ממוצע נדרש: <b class="text-pink-600">${toHHMM(needed)}</b></span>
                 </div>
-                <div class="flex justify-between items-center text-sm">
-                    <span class="font-bold text-slate-500">ממוצע שעות נדרש:</span>
-                    <span class="font-black text-pink-600 text-lg">${toHHMM(needed)}</span>
-                </div>
-                <div class="mt-2 pt-2 border-t border-pink-50 text-[10px] text-pink-400 font-medium">
-                    * ימי חופשה/מחלה שמוזנים ביומן אינם נספרים כימי עבודה.
+                <div class="mt-1 text-[9px] opacity-70">
+                    * ימי חופשה שהוזנו הוסרו מהחישוב באופן אוטומטי.
                 </div>
             `;
         }
